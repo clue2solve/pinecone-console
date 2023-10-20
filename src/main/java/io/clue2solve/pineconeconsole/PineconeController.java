@@ -1,6 +1,7 @@
 package io.clue2solve.pineconeconsole;
 
 import io.clue2solve.pinecone.javaclient.PineconeDBClient;
+import io.clue2solve.pinecone.javaclient.model.QueryResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
