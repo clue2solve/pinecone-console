@@ -2,6 +2,8 @@ package io.clue2solve.pineconeconsole;
 
 import io.clue2solve.pinecone.javaclient.PineconeDBClient;
 import io.clue2solve.pinecone.javaclient.model.QueryResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +36,31 @@ public class PineconeController {
 
     @PostMapping("/query")
     public ResponseEntity<String> query(@RequestBody QueryRequest payload) throws IOException {
-        Response response = client.query(payload.getIndexName(), true, true, payload.getQueryVector());
-        return ResponseEntity.ok(response.body().string());
+        List<QueryResponse> queryResponses = client.query(payload.getIndexName(), true, true, payload.getQueryVector());
+
+
+        return ResponseEntity.ok(convertQueryResponsesToJson(queryResponses).toString());
+    }
+
+    public static JSONObject convertQueryResponsesToJson(List<QueryResponse> responses) {
+        JSONArray jsonArray = new JSONArray();
+
+        for (QueryResponse response : responses) {
+//            LOG.info(response.toString());
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id", response.getId().toString());
+            jsonObject.put("score", response.getScore());
+            jsonObject.put("values", response.getValues());
+            LOG.info("Metadata : {}", response.getMetadata());
+            jsonObject.put("metadata", new JSONObject(response.getMetadata())); // assuming metadata is a stringified JSON
+//
+            jsonArray.put(jsonObject);
+        }
+
+        JSONObject result = new JSONObject();
+        result.put("matches", jsonArray);
+
+        return result;
     }
 
 //    @PostMapping("/upsert")
