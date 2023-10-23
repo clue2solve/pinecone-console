@@ -1,6 +1,7 @@
 package io.clue2solve.pineconeconsole;
 
 import io.clue2solve.pinecone.javaclient.PineconeDBClient;
+import io.clue2solve.pinecone.javaclient.model.QueryRequest;
 import io.clue2solve.pinecone.javaclient.model.QueryResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,7 +37,14 @@ public class PineconeController {
 
     @PostMapping("/query")
     public ResponseEntity<String> query(@RequestBody QueryRequest payload) throws IOException {
-        List<QueryResponse> queryResponses = client.query(payload.getIndexName(), true, true, payload.getQueryVector());
+        QueryRequest queryRequest = QueryRequest.builder()
+                .indexName(payload.getIndexName())
+                .includeMetadata(true)
+                .includeValues(true)
+                .queryVector(payload.getQueryVector())
+                .build();
+
+        List<QueryResponse> queryResponses = client.query(queryRequest);
 
 
         return ResponseEntity.ok(convertQueryResponsesToJson(queryResponses).toString());
@@ -46,14 +54,11 @@ public class PineconeController {
         JSONArray jsonArray = new JSONArray();
 
         for (QueryResponse response : responses) {
-//            LOG.info(response.toString());
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("id", response.getId().toString());
             jsonObject.put("score", response.getScore());
             jsonObject.put("values", response.getValues());
-            LOG.info("Metadata : {}", response.getMetadata());
             jsonObject.put("metadata", new JSONObject(response.getMetadata())); // assuming metadata is a stringified JSON
-//
             jsonArray.put(jsonObject);
         }
 
