@@ -70,14 +70,9 @@ public class PineconeController {
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody String payload) throws IOException {
 
-//        LOG.info("payload: " + payload);
-
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonRequest = mapper.readTree(payload.toString());
-//        LOG.info("jsonRequest: " + jsonRequest.toString());
         JsonNode vectors = jsonRequest.get("upsertVectorsList");
-        LOG.info("vectors: " + vectors.toString());
-        LOG.info("metadata: " + vectors.get(0).get("metadata"));
         List<UpsertVector> upsertVectorsList = new ArrayList<UpsertVector>();
         for (JsonNode vector : vectors) {
             JsonNode values = vector.get("values");
@@ -92,13 +87,8 @@ public class PineconeController {
                     .values(valuesList)
                     .build();
             upsertVectorsList.add(upsertVector);
-            LOG.info("upsertVector getMetadata() : " + upsertVector.getMetadata());
         }
 
-        //Log upsertVecList
-        for (UpsertVector upsertVector : upsertVectorsList) {
-            LOG.info("upsertVector metadata via List : " + upsertVector.getMetadata());
-        }
         UpsertRequest upsertRequest = UpsertRequest.builder()
                 .indexName(jsonRequest.get("indexName").toString().substring(1, jsonRequest.get("indexName").toString().length() - 1))
                 .nameSpace(jsonRequest.get("nameSpace").toString())
@@ -106,10 +96,7 @@ public class PineconeController {
                 .build();
 
         String response = client.upsert(upsertRequest);
-//        LOG.info("upsert response: " + response.body().string());
-//        LOG.info("upsert response: " + response);
-        return ResponseEntity.ok("{\"upsertedCount\": " + 1+ "}");
-//        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok(response);
     }
 
 
@@ -130,18 +117,6 @@ public class PineconeController {
 
         return result;
     }
-
-//    @PostMapping("/upsert")
-//    public ResponseEntity<String> upsert(@RequestBody UpsertPayload payload) throws IOException {
-//        String indexName = payload.getIndexName();
-//        List<Double> vector = payload.getVector();
-//        String id = payload.getId();
-//
-//        Response response = client.upsert(indexName, vector, id);
-//        return ResponseEntity.ok(response.body().string());
-//    }
-
-
 
 }
 
