@@ -69,6 +69,7 @@ public class PineconeController {
 
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody String payload) throws IOException {
+        //TODO: Need to change the String type to the PostUpsertRequest type, using a string looks hacky
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonRequest = mapper.readTree(payload.toString());
@@ -89,6 +90,7 @@ public class PineconeController {
             upsertVectorsList.add(upsertVector);
         }
 
+        //TODO: moving to payload of type PostUpsertRequest will allow us to remove this hacky code for remoding double quotes
         UpsertRequest upsertRequest = UpsertRequest.builder()
                 .indexName(jsonRequest.get("indexName").toString().substring(1, jsonRequest.get("indexName").toString().length() - 1))
                 .nameSpace(jsonRequest.get("nameSpace").toString())
