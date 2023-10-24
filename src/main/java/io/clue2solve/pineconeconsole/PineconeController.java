@@ -1,8 +1,13 @@
 package io.clue2solve.pineconeconsole;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.clue2solve.pinecone.javaclient.PineconeDBClient;
 import io.clue2solve.pinecone.javaclient.model.QueryRequest;
 import io.clue2solve.pinecone.javaclient.model.QueryResponse;
+import io.clue2solve.pinecone.javaclient.model.UpsertRequest;
+import io.clue2solve.pinecone.javaclient.model.UpsertVector;
+import lombok.extern.java.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +18,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -37,18 +43,75 @@ public class PineconeController {
 
     @PostMapping("/query")
     public ResponseEntity<String> query(@RequestBody QueryRequest payload) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonRequest = mapper.readTree(payload.toString());
+        LOG.info("jsonRequest: " + jsonRequest.toString());
+        JsonNode values = jsonRequest.get("queryVector");
+        List<Double> valuesList = new ArrayList<Double>();
+        for(JsonNode value : values) {
+            valuesList.add(value.asDouble());
+        }
+
+        LOG.info("valuesList: " + valuesList);
         QueryRequest queryRequest = QueryRequest.builder()
                 .indexName(payload.getIndexName())
                 .includeMetadata(true)
                 .includeValues(true)
-                .queryVector(payload.getQueryVector())
+                .top_k(payload.getTop_k())
+                .queryVector(valuesList)
                 .build();
 
         List<QueryResponse> queryResponses = client.query(queryRequest);
 
-
         return ResponseEntity.ok(convertQueryResponsesToJson(queryResponses).toString());
     }
+
+    @PostMapping("/upsert")
+    public ResponseEntity<String> upsert(@RequestBody String payload) throws IOException {
+
+//        LOG.info("payload: " + payload);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonRequest = mapper.readTree(payload.toString());
+//        LOG.info("jsonRequest: " + jsonRequest.toString());
+        JsonNode vectors = jsonRequest.get("upsertVectorsList");
+        LOG.info("vectors: " + vectors.toString());
+        LOG.info("metadata: " + vectors.get(0).get("metadata"));
+        List<UpsertVector> upsertVectorsList = new ArrayList<UpsertVector>();
+        for (JsonNode vector : vectors) {
+            JsonNode values = vector.get("values");
+            List<Double> valuesList = new ArrayList<Double>();
+            for(JsonNode value : values) {
+                valuesList.add(value.asDouble());
+            }
+
+            UpsertVector upsertVector = UpsertVector.builder()
+                    .id(vector.get("id").asText())
+                    .metadata(String.valueOf(vector.get("metadata")))
+                    .values(valuesList)
+                    .build();
+            upsertVectorsList.add(upsertVector);
+            LOG.info("upsertVector getMetadata() : " + upsertVector.getMetadata());
+        }
+
+        //Log upsertVecList
+        for (UpsertVector upsertVector : upsertVectorsList) {
+            LOG.info("upsertVector metadata via List : " + upsertVector.getMetadata());
+        }
+        UpsertRequest upsertRequest = UpsertRequest.builder()
+                .indexName(jsonRequest.get("indexName").toString().substring(1, jsonRequest.get("indexName").toString().length() - 1))
+                .nameSpace(jsonRequest.get("nameSpace").toString())
+                .upsertVectorsList(upsertVectorsList)
+                .build();
+
+        String response = client.upsert(upsertRequest);
+//        LOG.info("upsert response: " + response.body().string());
+//        LOG.info("upsert response: " + response);
+        return ResponseEntity.ok("{\"upsertedCount\": " + 1+ "}");
+//        return ResponseEntity.ok("ok");
+    }
+
 
     public static JSONObject convertQueryResponsesToJson(List<QueryResponse> responses) {
         JSONArray jsonArray = new JSONArray();
