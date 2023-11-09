@@ -7,6 +7,7 @@ import io.clue2solve.pinecone.javaclient.model.QueryRequest;
 import io.clue2solve.pinecone.javaclient.model.QueryResponse;
 import io.clue2solve.pinecone.javaclient.model.UpsertRequest;
 import io.clue2solve.pinecone.javaclient.model.UpsertVector;
+import io.clue2solve.pineconeconsole.model.PostUpsertRequest;
 import lombok.extern.java.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,27 +44,7 @@ public class PineconeController {
 
     @PostMapping("/query")
     public ResponseEntity<String> query(@RequestBody QueryRequest payload) throws IOException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonRequest = mapper.readTree(payload.toString());
-        LOG.info("jsonRequest: " + jsonRequest.toString());
-        JsonNode values = jsonRequest.get("queryVector");
-        List<Double> valuesList = new ArrayList<Double>();
-        for(JsonNode value : values) {
-            valuesList.add(value.asDouble());
-        }
-
-        LOG.info("valuesList: " + valuesList);
-        QueryRequest queryRequest = QueryRequest.builder()
-                .indexName(payload.getIndexName())
-                .includeMetadata(true)
-                .includeValues(true)
-                .top_k(payload.getTop_k())
-                .queryVector(valuesList)
-                .build();
-
-        List<QueryResponse> queryResponses = client.query(queryRequest);
-
+        List<QueryResponse> queryResponses = client.query(payload);
         return ResponseEntity.ok(convertQueryResponsesToJson(queryResponses).toString());
     }
 
