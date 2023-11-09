@@ -25,10 +25,12 @@ These instructions will get you a copy of the project up and running on your loc
 ```bash
 git clone https://github.com/clue2solve/pinecone-console.git
 cd pinecone-console
-Configure application properties:
-Open src/main/resources/application.properties and set your Pinecone project details:
+```
 
-properties
+### Configure `application properties`:
+Open `src/main/resources/application.properties` and set your Pinecone project details:
+
+**properties**
 
 ```bash
 pinecone.environment=your-environment
@@ -43,7 +45,6 @@ mvn clean install
 
 ### Run the application:
 ```bash
-Copy code
 mvn spring-boot:run
 ```
 
