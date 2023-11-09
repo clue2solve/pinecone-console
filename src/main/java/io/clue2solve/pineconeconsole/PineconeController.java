@@ -3,10 +3,7 @@ package io.clue2solve.pineconeconsole;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.clue2solve.pinecone.javaclient.PineconeDBClient;
-import io.clue2solve.pinecone.javaclient.model.QueryRequest;
-import io.clue2solve.pinecone.javaclient.model.QueryResponse;
-import io.clue2solve.pinecone.javaclient.model.UpsertRequest;
-import io.clue2solve.pinecone.javaclient.model.UpsertVector;
+import io.clue2solve.pinecone.javaclient.model.*;
 import io.clue2solve.pineconeconsole.model.PostUpsertRequest;
 import lombok.extern.java.Log;
 import org.json.JSONArray;
@@ -79,6 +76,12 @@ public class PineconeController {
                 .build();
 
         String response = client.upsert(upsertRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<String> delete(@RequestBody DeleteRequest payload) throws IOException {
+        String response = client.delete(payload);
         return ResponseEntity.ok(response);
     }
 
