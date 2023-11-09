@@ -27,6 +27,10 @@ public class PineconeController {
     private PineconeDBClient client;
     private final PineconeProperties properties;
 
+    /**
+     * This is the constructor for the PineconeController class.
+     * @param properties PineconeProperties
+     */
     @Autowired
     public PineconeController(PineconeProperties properties) {
         this.properties = properties;
@@ -39,12 +43,36 @@ public class PineconeController {
         return ResponseEntity.ok(response.body().string());
     }
 
+    /**
+     * This method is used to create an index.
+     * @param payload QueryRequest
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/query")
     public ResponseEntity<String> query(@RequestBody QueryRequest payload) throws IOException {
         List<QueryResponse> queryResponses = client.query(payload);
         return ResponseEntity.ok(convertQueryResponsesToJson(queryResponses).toString());
     }
 
+    /**
+     * This method fetches a vector from the index.
+     * @param payload FetchRequest
+     * @return String ( fetchResponse.toString() )
+     * @throws IOException
+     */
+    @PostMapping("/fetch")
+    public ResponseEntity<String> fetch(@RequestBody FetchRequest payload) throws IOException {
+        FetchResponse fetchResponse = client.fetch(payload);
+        return ResponseEntity.ok(fetchResponse.toString());
+    }
+
+    /**
+     * This method is used to upsert a vector into the index.
+     * @param payload PostUpsertRequest ( String)
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody String payload) throws IOException {
         //TODO: Need to change the String type to the PostUpsertRequest type, using a string looks hacky
@@ -79,6 +107,12 @@ public class PineconeController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * This method is used to delete a vector from the index.
+     * @param payload DeleteRequest
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/delete")
     public ResponseEntity<String> delete(@RequestBody DeleteRequest payload) throws IOException {
         String response = client.delete(payload);
