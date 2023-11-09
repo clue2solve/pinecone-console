@@ -72,16 +72,16 @@ curl -X POST http://localhost:8080/query \
 
 **Replace the example payload with your actual query.**
 
-Documentation
+### Documentation
 For more detailed documentation, visit the Pinecone Documentation.
 
-Contributing
+### Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
 
-License
+### License
 Distributed under the MIT License. See LICENSE for more information.
 
-Acknowledgements
+### Acknowledgements
 Pinecone Systems Inc. for providing the vector database platform.
 Contributors who have participated in making this application.
