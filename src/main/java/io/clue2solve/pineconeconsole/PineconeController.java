@@ -64,7 +64,7 @@ public class PineconeController {
     @PostMapping("/fetch")
     public ResponseEntity<String> fetch(@RequestBody FetchRequest payload) throws IOException {
         FetchResponse fetchResponse = client.fetch(payload);
-        return ResponseEntity.ok(fetchResponse.toString());
+        return ResponseEntity.ok(fetchResponse.toJSONString());
     }
 
     /**
@@ -99,11 +99,11 @@ public class PineconeController {
         //TODO: moving to payload of type PostUpsertRequest will allow us to remove this hacky code for remoding double quotes
         UpsertRequest upsertRequest = UpsertRequest.builder()
                 .indexName(jsonRequest.get("indexName").toString().substring(1, jsonRequest.get("indexName").toString().length() - 1))
-                .nameSpace(jsonRequest.get("nameSpace").toString())
+                .namespace(jsonRequest.get("nameSpace").toString())
                 .upsertVectorsList(upsertVectorsList)
                 .build();
 
-        String response = client.upsert(upsertRequest);
+        String response = client.  upsert(upsertRequest);
         return ResponseEntity.ok(response);
     }
 

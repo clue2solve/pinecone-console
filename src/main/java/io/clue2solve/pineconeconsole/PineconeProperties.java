@@ -20,6 +20,13 @@ public class PineconeProperties {
     @Setter
     private String apiKey;
 
+    @Getter
+    @Setter
+    private String indexName;
+
+    @Getter
+    @Setter
+    private String namespace;
     // getters and setters
 }
 
